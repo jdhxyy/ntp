@@ -46,7 +46,7 @@ func main() {
 func ntpService(pipe uint64, srcIA uint64, req []uint8) ([]uint8, int) {
 	addr := dcom.PortToAddr(pipe)
 
-	timeZone := 8
+	var timeZone int
 	if len(req) == 0 {
 		timeZone = 8
 	} else if len(req) == 1 {
