@@ -29,7 +29,7 @@ func main() {
 		panic(err)
 	}
 	lagan.EnableColor(true)
-	lagan.SetFilterLevel(lagan.LevelInfo)
+	lagan.SetFilterLevel(lagan.LevelDebug)
 
 	_, err = tziot.BindPipeNet(config.LocalIA, config.LocalPwd, config.LocalIP, config.LocalPort)
 	if err != nil {
@@ -44,7 +44,7 @@ func main() {
 // ntpService 校时服务
 // 返回值是应答和错误码.错误码为0表示回调成功,否则是错误码
 func ntpService(pipe uint64, srcIA uint64, req []uint8) ([]uint8, int) {
-	addr := dcom.PortToAddr(pipe)
+	addr := dcom.PipeToAddr(pipe)
 
 	var timeZone int
 	if len(req) == 0 {
