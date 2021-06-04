@@ -52,9 +52,9 @@ func main() {
 	lagan.EnableColor(true)
 	lagan.SetFilterLevel(lagan.LevelInfo)
 
-	_, err = tziot.BindPipeNet(config.LocalIA, config.LocalPwd, config.LocalIP, config.LocalPort)
-	if err != nil {
-		panic(err)
+	pipe := tziot.BindPipeNet(config.LocalIA, config.LocalPwd, config.LocalIP, config.LocalPort)
+	if pipe == 0 {
+		lagan.Error(tag, "bind pipe failed!")
 		return
 	}
 	tziot.Register(ridGetTime1, ntpService1)
