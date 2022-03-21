@@ -1,26 +1,19 @@
-// Copyright 2021-2021 The jdh99 Authors. All rights reserved.
+// Copyright 2021-2022 The jdh99 Authors. All rights reserved.
 // 网络校时服务
 // Authors: jdh99 <jdh821@163.com>
 
 package main
 
 import (
+	"github.com/jdhxyy/arrow"
 	"github.com/jdhxyy/dcom"
 	"github.com/jdhxyy/lagan"
-	"github.com/jdhxyy/tziot"
+	"github.com/jdhxyy/utz"
 	"ntp/config"
 	"time"
 )
 
 const tag = "ntp"
-
-// 应用错误码
-const (
-	// 内部错误
-	errorCodeInternalError = 0x40
-	// 接收格式错误
-	errorCodeRxFormat = 0x41
-)
 
 // rid号
 const (
@@ -30,7 +23,7 @@ const (
 	ridGetTime2 = 2
 )
 
-// ACK格式
+// AckRidGetTime2 ACK格式
 type AckRidGetTime2 struct {
 	// 时区
 	TimeZone uint8
@@ -50,23 +43,24 @@ func main() {
 		panic(err)
 	}
 	lagan.EnableColor(true)
-	lagan.SetFilterLevel(lagan.LevelInfo)
+	lagan.SetFilterLevel(lagan.LevelDebug)
 
-	pipe := tziot.BindPipeNet(config.LocalIA, config.LocalPwd, config.LocalIP, config.LocalPort)
-	if pipe == 0 {
-		lagan.Error(tag, "bind pipe failed!")
+	err = arrow.Load(config.LocalIA, config.LocalIP, config.LocalPort, config.CoreIA, config.CoreIP, config.CorePort)
+	if err != nil {
+		lagan.Error(tag, "arrow load failed!")
 		return
 	}
-	tziot.Register(ridGetTime1, ntpService1)
-	tziot.Register(ridGetTime2, ntpService2)
+
+	arrow.Register(utz.HeaderCcp, ridGetTime1, ntpService1)
+	arrow.Register(utz.HeaderCcp, ridGetTime2, ntpService2)
 
 	select {}
 }
 
-// ntpService1 校时服务
-// 返回值是应答和错误码.错误码为0表示回调成功,否则是错误码
-func ntpService1(pipe uint64, srcIA uint64, req []uint8) ([]uint8, int) {
-	addr := dcom.PipeToAddr(pipe)
+func ntpService1(req []uint8, params ...interface{}) []uint8 {
+	ia := params[0].(uint32)
+	ip := params[1].(uint32)
+	port := params[2].(uint16)
 
 	var timeZone int
 	if len(req) == 0 {
@@ -74,13 +68,14 @@ func ntpService1(pipe uint64, srcIA uint64, req []uint8) ([]uint8, int) {
 	} else if len(req) == 1 {
 		timeZone = int(int8(req[0]))
 	} else {
-		lagan.Warn(tag, "addr:%v ia:0x%x ntp failed.len is wrong:%d", addr, srcIA, len(req))
-		return nil, errorCodeRxFormat
+		lagan.Warn(tag, "addr:0x%08x:%d ia:0x%x ntp failed.len is wrong:%d", ip, port, ia, len(req))
+		return nil
 	}
 
 	t := getTime(timeZone)
-	lagan.Info(tag, "addr:%v ia:0x%x ntp time:%v", addr, srcIA, t)
-	return []uint8(t.Format("2006-01-02 15:04:05 -0700 MST")), 0
+
+	lagan.Info(tag, "addr:0x%08x:%d ia:0x%x ntp time:%v", ip, port, ia, t)
+	return []uint8(t.Format("2006-01-02 15:04:05 -0700 MST"))
 }
 
 func getTime(timeZone int) time.Time {
@@ -91,10 +86,10 @@ func getTime(timeZone int) time.Time {
 	return t
 }
 
-// ntpService2 校时服务
-// 返回值是应答和错误码.错误码为0表示回调成功,否则是错误码
-func ntpService2(pipe uint64, srcIA uint64, req []uint8) ([]uint8, int) {
-	addr := dcom.PipeToAddr(pipe)
+func ntpService2(req []uint8, params ...interface{}) []uint8 {
+	ia := params[0].(uint32)
+	ip := params[1].(uint32)
+	port := params[2].(uint16)
 
 	var timeZone int
 	if len(req) == 0 {
@@ -102,12 +97,12 @@ func ntpService2(pipe uint64, srcIA uint64, req []uint8) ([]uint8, int) {
 	} else if len(req) == 1 {
 		timeZone = int(int8(req[0]))
 	} else {
-		lagan.Warn(tag, "addr:%v ia:0x%x ntp failed.len is wrong:%d", addr, srcIA, len(req))
-		return nil, errorCodeRxFormat
+		lagan.Warn(tag, "addr:0x%08x:%d ia:0x%08x ntp failed.len is wrong:%d", ip, port, ia, len(req))
+		return nil
 	}
 
 	t := getTime(timeZone)
-	lagan.Info(tag, "addr:%v ia:0x%x ntp time:%v", addr, srcIA, t)
+	lagan.Info(tag, "addr:0x%08x:%d ia:0x%x ntp time:%v", ip, port, ia, t)
 
 	var ack AckRidGetTime2
 	ack.TimeZone = uint8(timeZone)
@@ -121,8 +116,8 @@ func ntpService2(pipe uint64, srcIA uint64, req []uint8) ([]uint8, int) {
 
 	data, err := dcom.StructToBytes(ack)
 	if err != nil {
-		lagan.Error(tag, "addr:%v ia:0x%x ntp failed.struct to bytes error:%v", addr, srcIA, err)
-		return nil, errorCodeInternalError
+		lagan.Error(tag, "addr:0x%08x:%d ia:0x%x ntp failed.struct to bytes error:%v", ip, port, ia, err)
+		return nil
 	}
-	return data, 0
+	return data
 }
