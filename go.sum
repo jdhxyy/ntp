@@ -3,8 +3,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/huandu/go-assert v1.1.5 h1:fjemmA7sSfYHJD7CUqs9qTwwfdNAx7/j2/ZlHXzNB3c=
 github.com/huandu/go-assert v1.1.5/go.mod h1:yOLvuqZwmcHIC5rIzrBhT7D3Q9c3GFnd0JrPVhn/06U=
-github.com/jdhxyy/arrow v0.0.0-20220730004100-289783de8758 h1:CopmqzzfH2lU15HIDVOBk7zD5uaMiqipB9xnZFlWYrk=
-github.com/jdhxyy/arrow v0.0.0-20220730004100-289783de8758/go.mod h1:LWL5H4n8RwOIE2sKDGmVkjGjFxha2zswX1QvvO7nn/s=
+github.com/jdhxyy/arrow v0.0.0-20220730054447-3d06d7d20dfc h1:dvsb99x4C0C/eCw+21dDyIhpXzgzVlBkUpgOZnFqa5w=
+github.com/jdhxyy/arrow v0.0.0-20220730054447-3d06d7d20dfc/go.mod h1:LWL5H4n8RwOIE2sKDGmVkjGjFxha2zswX1QvvO7nn/s=
 github.com/jdhxyy/crc16 v0.0.0-20210228220550-7713e2f73123 h1:A3y5GyayKrpj+4EwUnvb8VucRShsbX4PDXlcRzTRunQ=
 github.com/jdhxyy/crc16 v0.0.0-20210228220550-7713e2f73123/go.mod h1:Bn2AQAKww6qAfp1Grz+AK2cnYKB/9a2WOcfkidTAWJQ=
 github.com/jdhxyy/dcom v0.0.0-20210415032121-a09548d7af99 h1:AhtQFRwfa2ibAuLcge7k9wr+He2uB57l6rtA1CM8t5U=
