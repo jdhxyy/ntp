@@ -1,8 +1,8 @@
 {
-  "LocalIA": "0x41000005",
-  "LocalIP": "127.0.0.1",
+  "LocalIA": "0x41000009",
+  "LocalIP": "0.0.0.0",
   "LocalPort": 12930,
   "CoreIA": "0x41000002",
-  "CoreIP": "127.0.0.1",
+  "CoreIP": "115.28.86.171",
   "CorePort": 14129
 }

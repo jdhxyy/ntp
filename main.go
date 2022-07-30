@@ -75,7 +75,9 @@ func ntpService1(req []uint8, params ...interface{}) []uint8 {
 	t := getTime(timeZone)
 
 	lagan.Info(tag, "addr:0x%08x:%d ia:0x%x ntp time:%v", ip, port, ia, t)
-	return []uint8(t.Format("2006-01-02 15:04:05 -0700 MST"))
+	ack := []uint8(t.Format("2006-01-02 15:04:05 -0700 MST"))
+	ack = append([]uint8{ridGetTime1}, ack...)
+	return ack
 }
 
 func getTime(timeZone int) time.Time {
@@ -104,20 +106,21 @@ func ntpService2(req []uint8, params ...interface{}) []uint8 {
 	t := getTime(timeZone)
 	lagan.Info(tag, "addr:0x%08x:%d ia:0x%x ntp time:%v", ip, port, ia, t)
 
-	var ack AckRidGetTime2
-	ack.TimeZone = uint8(timeZone)
-	ack.Year = uint16(t.Year())
-	ack.Month = uint8(t.Month())
-	ack.Day = uint8(t.Day())
-	ack.Hour = uint8(t.Hour())
-	ack.Minute = uint8(t.Minute())
-	ack.Second = uint8(t.Second())
-	ack.Weekday = uint8(t.Weekday())
+	var a AckRidGetTime2
+	a.TimeZone = uint8(timeZone)
+	a.Year = uint16(t.Year())
+	a.Month = uint8(t.Month())
+	a.Day = uint8(t.Day())
+	a.Hour = uint8(t.Hour())
+	a.Minute = uint8(t.Minute())
+	a.Second = uint8(t.Second())
+	a.Weekday = uint8(t.Weekday())
 
-	data, err := dcom.StructToBytes(ack)
+	ack, err := dcom.StructToBytes(a)
 	if err != nil {
 		lagan.Error(tag, "addr:0x%08x:%d ia:0x%x ntp failed.struct to bytes error:%v", ip, port, ia, err)
 		return nil
 	}
-	return data
+	ack = append([]uint8{ridGetTime2}, ack...)
+	return ack
 }
